@@ -1,12 +1,12 @@
 "use server";
 
 import {
-  UpdateGenreInput,
-  updateGenreSchema,
-} from "@/app/_validation/genres/update";
+  CreateGenreInput,
+  createGenreSchema,
+} from "@/app/_validation/genres/create";
 
-export function updateGenre(formData: UpdateGenreInput) {
-  const { songId, name } = updateGenreSchema.parse(formData);
+export async function createGenre(formData: CreateGenreInput) {
+  const { artistId, name } = createGenreSchema.parse(formData);
 
-  return { songId, name };
+  return { artistId, name };
 }

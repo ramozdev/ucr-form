@@ -5,7 +5,7 @@ import {
   createSongSchema,
 } from "@/app/_validation/songs/create";
 
-export function createSong(formData: CreateSongInput) {
+export async function createSong(formData: CreateSongInput) {
   const { artistId, name } = createSongSchema.parse(formData);
 
   return { artistId, name };

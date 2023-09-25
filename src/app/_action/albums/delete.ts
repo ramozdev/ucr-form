@@ -5,7 +5,7 @@ import {
   deleteAlbumSchema,
 } from "@/app/_validation/albums/delete";
 
-export function deleteAlbum(formData: DeleteAlbumInput) {
+export async function deleteAlbum(formData: DeleteAlbumInput) {
   const { id } = deleteAlbumSchema.parse(formData);
 
   return { id };

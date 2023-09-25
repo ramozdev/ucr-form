@@ -2,7 +2,7 @@ import { z } from "zod";
 
 const createSongSchema = z.object({
   name: z.string(),
-  artistId: z.number(),
+  artistId: z.string(),
 });
 
 export { createSongSchema };

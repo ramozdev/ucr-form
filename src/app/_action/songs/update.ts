@@ -5,7 +5,7 @@ import {
   updateSongSchema,
 } from "@/app/_validation/songs/update";
 
-export function updateSong(formData: UpdateSongInput) {
+export async function updateSong(formData: UpdateSongInput) {
   const { songId, name } = updateSongSchema.parse(formData);
 
   return { songId, name };

@@ -3,8 +3,8 @@ import { z } from "zod";
 const updateSongSchema = z
   .object({
     name: z.string(),
-    favorite: z.boolean(),
-    artistId: z.number(),
+    favorite: z.string(),
+    artistId: z.string(),
   })
   .partial()
   .extend({
