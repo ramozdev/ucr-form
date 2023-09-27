@@ -1,6 +1,6 @@
 type CudObject = {
   [key: string]: {
-    action: string;
+    action: "" | "create" | "update" | "delete" | "id";
     value: string;
   };
 };

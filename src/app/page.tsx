@@ -39,7 +39,7 @@ const defaultData: CudAlbumInput = {
   id: "1",
   album: {
     albumId: {
-      action: "",
+      action: "id",
       value: "12",
     },
     artistId: {
@@ -53,7 +53,7 @@ const defaultData: CudAlbumInput = {
   },
   genres: genres.map((genre) => ({
     genreId: {
-      action: "",
+      action: "id",
       value: genre.genreId,
     },
     name: {
@@ -67,7 +67,7 @@ const defaultData: CudAlbumInput = {
   })),
   songs: songs.map((song) => ({
     songId: {
-      action: "",
+      action: "id",
       value: song.songId,
     },
     name: {
