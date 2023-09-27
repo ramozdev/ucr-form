@@ -5,67 +5,70 @@ type CudObject = {
   };
 };
 
-export function processObjectUpdate(obj: CudObject) {
-  return Object.fromEntries(
-    Object.entries(obj)
-      .filter(([_, { action }]) => action === "update" || action === "id")
-      .map(([key, { value }]) => [key, value])
+export function processObjectUpdate(object: CudObject) {
+  const isUpdate = Object.values(object).some(
+    ({ action }) => action === "update"
+  );
+
+  if (!isUpdate) return {};
+
+  return Object.entries(object).reduce<{ [key: string]: string }>(
+    (acc, [key, item]) => {
+      if (item.action === "update" || item.action === "id") {
+        acc[key] = item.value;
+      }
+      return acc;
+    },
+    {}
   );
 }
 
-export function processArrayUpdate(arr: CudObject[]) {
-  const isUpdate =
-    arr.every((item) =>
-      Object.values(item).every(({ action }) => action !== "delete")
-    ) &&
-    arr.every((item) =>
-      Object.values(item).every(({ action }) => action !== "create")
-    );
-
-  if (!isUpdate) return [];
-
-  return arr
-    .map((item) =>
-      Object.entries(item)
-        .filter(([_, { action }]) => action === "update" || action === "id")
-        .map(([key, { value }]) => [key, value])
+export function processArrayUpdate(array: CudObject[]) {
+  return array
+    .filter((object) =>
+      Object.values(object).some(({ action }) => action === "update")
     )
-    .map((item) => Object.fromEntries(item as [string, string][]));
+    .map((object) => {
+      return Object.entries(object).reduce<{ [key: string]: string }>(
+        (acc, [key, item]) => {
+          if (item.action === "update" || item.action === "id") {
+            acc[key] = item.value;
+          }
+          return acc;
+        },
+        {}
+      );
+    });
 }
 
-export function processArrayDelete(arr: CudObject[]) {
-  const isDelete = arr.some((item) =>
-    Object.values(item).some(({ action }) => action === "delete")
+export function processArrayDelete(array: CudObject[]) {
+  return array
+    .filter((object) =>
+      Object.values(object).some(({ action }) => action === "delete")
+    )
+    .map((object) =>
+      Object.entries(object).reduce<{ [key: string]: string }>(
+        (acc, [key, item]) => {
+          if (item.action === "id") {
+            acc[key] = item.value;
+          }
+          return acc;
+        },
+        {}
+      )
+    );
+}
+
+export function processArrayCreate(array: CudObject[]) {
+  return array.map((object) =>
+    Object.entries(object).reduce<{ [key: string]: string }>(
+      (acc, [key, item]) => {
+        if (item.action === "create") {
+          acc[key] = item.value;
+        }
+        return acc;
+      },
+      {}
+    )
   );
-
-  if (!isDelete) return [];
-
-  return arr
-    .filter((item) =>
-      Object.values(item).some(({ action }) => action === "delete")
-    )
-    .map((item) => item);
-}
-
-export function processArrayCreate(arr: CudObject[]) {
-  const isCreate =
-    arr.every((item) =>
-      Object.values(item).every(({ action }) => action !== "delete")
-    ) &&
-    arr.every((item) =>
-      Object.values(item).every(({ action }) => action !== "update")
-    );
-
-  if (!isCreate) return [];
-
-  return arr
-    .filter((item) =>
-      Object.values(item).some(({ action }) => action === "create")
-    )
-    .map((item) =>
-      Object.entries(item)
-        .filter(([_, { action }]) => action === "create" || action === "id")
-        .map(([key, { value }]) => [key, value])
-    )
-    .map((item) => Object.fromEntries(item as [string, string][]));
 }

@@ -2,7 +2,7 @@ import { z } from "zod";
 
 const itemSchema = z.object({
   value: z.string(),
-  action: z.string(),
+  action: z.enum(["", "create", "update", "delete", "id"]),
 });
 
 const cudAlbumSchema = z.object({
