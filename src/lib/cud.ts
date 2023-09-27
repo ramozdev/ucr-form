@@ -60,15 +60,19 @@ export function processArrayDelete(array: CudObject[]) {
 }
 
 export function processArrayCreate(array: CudObject[]) {
-  return array.map((object) =>
-    Object.entries(object).reduce<{ [key: string]: string }>(
-      (acc, [key, item]) => {
-        if (item.action === "create") {
-          acc[key] = item.value;
-        }
-        return acc;
-      },
-      {}
-    )
-  );
+  return array
+    .filter((object) => {
+      return Object.values(object).some(({ action }) => action === "create");
+    })
+    .map((object) =>
+      Object.entries(object).reduce<{ [key: string]: string }>(
+        (acc, [key, item]) => {
+          if (item.action === "create") {
+            acc[key] = item.value;
+          }
+          return acc;
+        },
+        {}
+      )
+    );
 }
