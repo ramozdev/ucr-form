@@ -9,8 +9,8 @@ A cud object is an object that contains a list of objects and arrays. Each item 
 ```ts
 type CudObject = {
   [key: string]: {
-    action: "" | "create" | "update" | "delete" | "id";
-    value: string;
+    action: "" | "CREATE" | "UPDATE" | "DELETE" | "ID";
+    value: string | boolean;
   };
 };
 ```
@@ -18,10 +18,10 @@ type CudObject = {
 ### Actions
 
 - `""`: No action. This value is assigned by default to items fetched from the database.
-- `"create"`: Create a new row in the database. If any item in a `CuDObject` has this action, the entire object will be created. You may omit the `"id"` key if you are creating a new object.
-- `"update"`: Update a row in the database. If any item in a `CuDObject` has this action, the entire object will be updated. There must be a key with the action `"id"` in order to update an object.
-- `"delete"`: Delete a row in the database. If any item in a `CuDObject` has this action, the entire object will be deleted. There must be a key with the action `"id"` in order to delete an object.
-- `"id"`: The id for a row. This item is required for `"update"` and `"delete"` actions.
+- `"CREATE"`: Create a new row in the database. If any item in a `CuDObject` has this action, the entire object will be created. You may omit the `"ID"` key if you are creating a new object.
+- `"UPDATE"`: Update a row in the database. If any item in a `CuDObject` has this action, the entire object will be updated. There must be a key with the action `"ID"` in order to update an object.
+- `"DELETE"`: Delete a row in the database. If any item in a `CuDObject` has this action, the entire object will be deleted. There must be a key with the action `"ID"` in order to delete an object.
+- `"ID"`: The ID for a row. This item is required for `"UPDATE"` and `"DELETE"` actions.
 
 ### Example
 
@@ -31,7 +31,7 @@ In this example we have a todo list with a `name` and `description`. The todo li
 {
   "todo": {
     "todoId": {
-      "action": "id",
+      "action": "ID",
       "value": "12"
     },
     "name": {
@@ -46,7 +46,7 @@ In this example we have a todo list with a `name` and `description`. The todo li
   "tasks": [
     {
       "taskId": {
-        "action": "id",
+        "action": "ID",
         "value": "3"
       },
       "name": {
@@ -60,7 +60,7 @@ In this example we have a todo list with a `name` and `description`. The todo li
     },
     {
       "taskId": {
-        "action": "id",
+        "action": "ID",
         "value": "4"
       },
       "name": {
@@ -69,7 +69,7 @@ In this example we have a todo list with a `name` and `description`. The todo li
       },
       "completed": {
         "action": "",
-        "value": "false"
+        "value": false
       }
     }
   ]
@@ -82,40 +82,40 @@ In this example we are updating the todo list name and description, updating the
 {
   "todo": {
     "todoId": {
-      "action": "id",
+      "action": "ID",
       "value": "12"
     },
     "name": {
-      "action": "update",
+      "action": "UPDATE",
       "value": "Shopping"
     },
     "description": {
-      "action": "update",
+      "action": "UPDATE",
       "value": "These are the things that I must buy."
     }
   },
   "tasks": [
     {
       "taskId": {
-        "action": "id",
+        "action": "ID",
         "value": "3"
       },
       "name": {
-        "action": "update",
+        "action": "UPDATE",
         "value": "Eggs"
       },
       "completed": {
-        "action": "update",
+        "action": "UPDATE",
         "value": "true"
       }
     },
     {
       "taskId": {
-        "action": "id",
+        "action": "ID",
         "value": "4"
       },
       "name": {
-        "action": "delete",
+        "action": "DELETE",
         "value": "Ham"
       },
       "completed": {
@@ -125,15 +125,15 @@ In this example we are updating the todo list name and description, updating the
     },
     {
       "taskId": {
-        "action": "create",
+        "action": "CREATE",
         "value": ""
       },
       "name": {
-        "action": "create",
+        "action": "CREATE",
         "value": "Potatoes"
       },
       "completed": {
-        "action": "create",
+        "action": "CREATE",
         "value": "false"
       }
     }
