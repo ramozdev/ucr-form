@@ -1,86 +1,47 @@
 import Form from "@/app/form";
-import { CudAlbumInput } from "@/app/validation";
+import { CudTodoInput } from "@/app/validation";
 
-const songs = [
+const tasks = [
   {
-    songId: "1",
-    name: "Song 1",
-    favorite: "true",
-    artistId: "1",
+    taskId: "3",
+    name: "egg",
+    completed: "false",
   },
   {
-    songId: "2",
-    name: "Song 2",
-    favorite: "true",
-    artistId: "1",
-  },
-  {
-    songId: "3",
-    name: "Song 3",
-    favorite: "true",
-    artistId: "1",
+    taskId: "4",
+    name: "Ham",
+    completed: "false",
   },
 ];
 
-const genres = [
-  {
-    genreId: "1",
-    name: "Genre 1",
-    artistId: "1",
-  },
-  {
-    genreId: "2",
-    name: "Genre 2",
-    artistId: "1",
-  },
-];
-
-const defaultData: CudAlbumInput = {
-  id: "1",
-  album: {
-    albumId: {
-      action: "id",
+const defaultData: CudTodoInput = {
+  todo: {
+    todoId: {
+      action: "ID",
       value: "12",
     },
-    artistId: {
-      action: "",
-      value: "232",
-    },
     name: {
       action: "",
-      value: "Album 1",
+      value: "Shopping List",
+    },
+    description: {
+      action: "",
+      value: "",
     },
   },
-  genres: genres.map((genre) => ({
-    genreId: {
-      action: "id",
-      value: genre.genreId,
+
+  tasks: tasks.map((task) => ({
+    taskId: {
+      action: "ID",
+      value: task.taskId,
     },
     name: {
       action: "",
-      value: genre.name,
+      value: task.name,
     },
-    artistId: {
+    completed: {
       action: "",
-      value: genre.artistId,
-    },
-  })),
-  songs: songs.map((song) => ({
-    songId: {
-      action: "id",
-      value: song.songId,
-    },
-    name: {
-      action: "",
-      value: song.name,
-    },
-    favorite: {
-      action: "",
-      value: song.favorite,
-    },
-    artistId: {
-      action: "",
-      value: song.artistId,
+      value: false,
     },
   })),
 };

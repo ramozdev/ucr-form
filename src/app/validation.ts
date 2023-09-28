@@ -1,36 +1,29 @@
 import { z } from "zod";
 
-const itemSchema = z.object({
+const cudItemSchema = z.object({
   value: z.string(),
-  action: z.enum(["", "create", "update", "delete", "id"]),
+  action: z.enum(["", "CREATE", "UPDATE", "DELETE", "ID"]),
 });
 
-const cudAlbumSchema = z.object({
-  id: z.string(),
-  album: z.object({
-    albumId: itemSchema,
-    artistId: itemSchema,
-    name: itemSchema,
+const cudTodoSchema = z.object({
+  todo: z.object({
+    todoId: cudItemSchema,
+    name: cudItemSchema,
+    description: cudItemSchema,
   }),
-  genres: z
+  tasks: z
     .object({
-      genreId: itemSchema,
-      artistId: itemSchema,
-      name: itemSchema,
-    })
-    .array(),
-  songs: z
-    .object({
-      songId: itemSchema,
-      artistId: itemSchema,
-      favorite: itemSchema,
-      name: itemSchema,
+      taskId: cudItemSchema,
+      name: cudItemSchema,
+      completed: cudItemSchema.pick({ action: true }).extend({
+        value: z.boolean(),
+      }),
     })
     .array(),
 });
 
-export { cudAlbumSchema };
+export { cudTodoSchema };
 
-type CudAlbumInput = z.input<typeof cudAlbumSchema>;
+type CudTodoInput = z.input<typeof cudTodoSchema>;
 
-export type { CudAlbumInput };
+export type { CudTodoInput };

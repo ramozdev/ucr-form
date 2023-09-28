@@ -1,28 +1,24 @@
 "use client";
 
-import { CudAlbumInput, cudAlbumSchema } from "@/app/validation";
+import { CudTodoInput, cudTodoSchema } from "@/app/validation";
 import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { startTransition } from "react";
-import { deleteGenre } from "@/app/_action/genres/delete";
-import { deleteSong } from "@/app/_action/songs/delete";
-import { createSong } from "@/app/_action/songs/create";
-import { updateGenre } from "@/app/_action/genres/update";
-import { updateSong } from "@/app/_action/songs/update";
-import { createGenre } from "@/app/_action/genres/create";
-import { UpdateSongInput } from "@/app/_validation/songs/update";
-import { UpdateGenreInput } from "@/app/_validation/genres/update";
-import { CreateGenreInput } from "@/app/_validation/genres/create";
-import { CreateSongInput } from "@/app/_validation/songs/create";
+import { deleteTask } from "@/app/_action/tasks/delete";
+import { createTask } from "@/app/_action/tasks/create";
+import { updateTask } from "@/app/_action/tasks/update";
+import { UpdateTaskInput } from "@/app/_validation/tasks/update";
+import { CreateTaskInput } from "@/app/_validation/tasks/create";
 import {
   processArrayCreate,
   processArrayDelete,
   processArrayUpdate,
   processObjectUpdate,
 } from "@/lib/cud";
+import { DeleteTaskInput } from "@/app/_validation/tasks/delete";
 
 type Props = {
-  defaultData?: CudAlbumInput;
+  defaultData?: CudTodoInput;
 };
 
 export default function Form({ defaultData }: Props) {
@@ -31,137 +27,131 @@ export default function Form({ defaultData }: Props) {
     handleSubmit,
     control,
     watch,
-    getValues,
     setValue,
-    formState: { errors, defaultValues },
-  } = useForm<CudAlbumInput>({
+    formState: { defaultValues },
+  } = useForm<CudTodoInput>({
     defaultValues: defaultData,
-    resolver: zodResolver(cudAlbumSchema, undefined, { raw: true }),
+    resolver: zodResolver(cudTodoSchema, undefined, { raw: true }),
   });
 
   const debugPayload = {
     update: {
-      album: processObjectUpdate(watch("album")),
-      genres: processArrayUpdate(watch("genres")) as UpdateGenreInput[],
-      songs: processArrayUpdate(watch("songs")) as UpdateSongInput[],
+      todo: processObjectUpdate(watch("todo")),
+      tasks: processArrayUpdate(watch("tasks")) as UpdateTaskInput[],
     },
     delete: {
-      genres: processArrayDelete(watch("genres")),
-      songs: processArrayDelete(watch("songs")),
+      tasks: processArrayDelete(watch("tasks")) as DeleteTaskInput[],
     },
     create: {
-      genres: processArrayCreate(watch("genres")) as CreateGenreInput[],
-      songs: processArrayCreate(watch("songs")) as CreateSongInput[],
+      tasks: processArrayCreate(watch("tasks")) as CreateTaskInput[],
     },
   };
 
-  const onSubmit = handleSubmit(({ id, album, genres, songs }) => {
+  const onSubmit = handleSubmit(({ todo, tasks }) => {
     startTransition(() => {
       try {
         const payload = {
           update: {
-            album: processObjectUpdate(album),
-            genres: processArrayUpdate(genres) as UpdateGenreInput[],
-            songs: processArrayUpdate(songs) as UpdateSongInput[],
+            todo: processObjectUpdate(todo),
+            tasks: processArrayUpdate(tasks) as UpdateTaskInput[],
           },
           delete: {
-            genres: processArrayDelete(genres),
-            songs: processArrayDelete(songs),
+            tasks: processArrayDelete(tasks) as DeleteTaskInput[],
           },
           create: {
-            genres: processArrayCreate(genres) as CreateGenreInput[],
-            songs: processArrayCreate(songs) as CreateSongInput[],
+            tasks: processArrayCreate(tasks) as CreateTaskInput[],
           },
         };
 
-        console.log({ payload });
-
-        // for (const id of payload.delete.genres) {
-        //   deleteGenre({ id });
-        // }
-        // for (const id of payload.delete.songs) {
-        //   deleteSong({ id });
-        // }
-        for (const task of payload.create.genres) {
-          createGenre({
-            ...task,
-            artistId: id,
-          });
+        for (const id of payload.delete.tasks) {
+          deleteTask(id);
         }
-        for (const step of payload.create.songs) {
-          createSong({
+        for (const step of payload.create.tasks) {
+          createTask({
             ...step,
-            artistId: id,
           });
         }
-        for (const task of payload.update.genres) {
-          updateGenre(task);
-        }
-        for (const step of payload.update.songs) {
-          updateSong(step);
+        for (const step of payload.update.tasks) {
+          updateTask(step);
         }
       } catch (err) {
         if (err instanceof Error) {
-          console.log(err.message);
+          console.error(err.message);
         }
       }
     });
   });
 
-  const _genres = useFieldArray({ control, name: "genres", keyName: "_id" });
-  const _songs = useFieldArray({ control, name: "songs", keyName: "_id" });
+  const _tasks = useFieldArray({ control, name: "tasks", keyName: "_id" });
 
   return (
     <main className="max-w-screen-md mx-auto">
       <form onSubmit={onSubmit} className="grid">
-        <label>Album Name</label>
+        <label>TODOS</label>
         <input
-          {...register("album.name.value", {
+          {...register("todo.name.value", {
             onChange: ({ target }) => {
               const { value } = target as HTMLInputElement;
-              setValue(`album.name.value`, value);
-              if (value !== defaultValues?.album?.name?.value) {
-                setValue(`album.name.action`, `update`);
+              setValue(`todo.name.value`, value);
+              if (value !== defaultValues?.todo?.name?.value) {
+                setValue(`todo.name.action`, `UPDATE`);
                 return;
               }
-              setValue(`album.name.action`, "");
+              setValue(`todo.name.action`, "");
             },
           })}
         />
-        {/* <label>Artist</label>
-        <input />
-        <label>Year</label>
-        <input />
-        <label>Genre</label>
-        <input />
-        <label>Rating</label>
-        <input />
-        <label>Songs</label>
-        <input /> */}
 
         <div className="mb-4">
-          {_songs.fields.map((field, index) => {
-            if (field.songId.action === "delete") return null;
+          {_tasks.fields.map((field, index) => {
+            if (field.name.action === "DELETE") return null;
 
             return (
               <div key={field._id}>
                 <div className="flex gap-2">
                   <div>
-                    <label htmlFor={`songs.${index}.name.value`}>Name</label>
+                    <label htmlFor={`tasks.${index}.name.value`}>Name</label>
                     <input
-                      {...register(`songs.${index}.name.value`, {
+                      {...register(`tasks.${index}.name.value`, {
                         onChange: ({ target }) => {
                           const { value } = target as HTMLInputElement;
-                          setValue(`songs.${index}.name.value`, value);
-                          if (field.songId.action !== "create") {
+                          setValue(`tasks.${index}.name.value`, value);
+                          if (field.taskId.action !== "CREATE") {
                             if (
-                              value !==
-                              defaultValues?.songs?.[index]?.name?.value
+                              value ===
+                              defaultValues?.tasks?.[index]?.name?.value
                             ) {
-                              setValue(`songs.${index}.name.action`, `update`);
+                              setValue(`tasks.${index}.name.action`, "");
                               return;
                             }
-                            setValue(`songs.${index}.name.action`, "");
+                            setValue(`tasks.${index}.name.action`, `UPDATE`);
+                          }
+                        },
+                      })}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor={`tasks.${index}.completed.value`}>
+                      Completed
+                    </label>
+                    <input
+                      type="checkbox"
+                      {...register(`tasks.${index}.completed.value`, {
+                        onChange: ({ target }) => {
+                          const { checked } = target as HTMLInputElement;
+                          setValue(`tasks.${index}.completed.value`, checked);
+                          if (field.taskId.action !== "CREATE") {
+                            if (
+                              checked ===
+                              defaultValues?.tasks?.[index]?.completed?.value
+                            ) {
+                              setValue(`tasks.${index}.completed.action`, "");
+                              return;
+                            }
+                            setValue(
+                              `tasks.${index}.completed.action`,
+                              `UPDATE`
+                            );
                           }
                         },
                       })}
@@ -171,15 +161,15 @@ export default function Form({ defaultData }: Props) {
                     type="button"
                     className="mt-auto"
                     onClick={() => {
-                      if (field.songId.value === "") {
-                        _songs.remove(index);
+                      if (field.taskId.value === "") {
+                        _tasks.remove(index);
                         return;
                       }
-                      _songs.update(index, {
+                      _tasks.update(index, {
                         ...field,
-                        songId: {
-                          ...field.songId,
-                          action: "delete",
+                        name: {
+                          ...field.name,
+                          action: "DELETE",
                         },
                       });
                     }}
@@ -195,11 +185,10 @@ export default function Form({ defaultData }: Props) {
               type="button"
               className="mb-8"
               onClick={() => {
-                _songs.append({
-                  favorite: { value: "1", action: "create" },
-                  name: { value: "", action: "create" },
-                  songId: { value: "", action: "create" },
-                  artistId: { value: "", action: "create" },
+                _tasks.append({
+                  name: { value: "", action: "CREATE" },
+                  taskId: { value: "", action: "CREATE" },
+                  completed: { value: false, action: "CREATE" },
                 });
               }}
             >
