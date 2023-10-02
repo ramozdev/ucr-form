@@ -1,4 +1,4 @@
-type CudObject = {
+export type CudObject = {
   [key: string]: {
     action: "" | "CREATE" | "UPDATE" | "DELETE" | "ID";
     value: string | boolean;
