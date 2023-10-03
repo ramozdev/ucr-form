@@ -1,6 +1,6 @@
 export type CudObject = {
   [key: string]: {
-    action: "" | "CREATE" | "UPDATE" | "DELETE" | "ID";
+    action: "" | "CREATE" | "UPDATE" | "REMOVE" | "ID";
     value: string | boolean;
   };
 };
@@ -41,10 +41,10 @@ export function processArrayUpdate(array: CudObject[]) {
     });
 }
 
-export function processArrayDelete(array: CudObject[]) {
+export function processArrayRemove(array: CudObject[]) {
   return array
     .filter((object) =>
-      Object.values(object).some(({ action }) => action === "DELETE")
+      Object.values(object).some(({ action }) => action === "REMOVE")
     )
     .map((object) =>
       Object.values(object).reduce<string | boolean>((acc, item) => {

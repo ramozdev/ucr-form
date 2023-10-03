@@ -2,7 +2,7 @@ import { z } from "zod";
 
 const cudItemSchema = z.object({
   value: z.string(),
-  action: z.enum(["", "CREATE", "UPDATE", "DELETE", "ID"]),
+  action: z.enum(["", "CREATE", "UPDATE", "REMOVE", "ID"]),
 });
 
 const cudTodoSchema = z.object({

@@ -3,19 +3,12 @@
 import { CudTodoInput, cudTodoSchema } from "@/app/validation";
 import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { startTransition } from "react";
-import { deleteTask } from "@/app/_action/tasks/delete";
-import { createTask } from "@/app/_action/tasks/create";
-import { updateTask } from "@/app/_action/tasks/update";
-import { UpdateTaskInput } from "@/app/_validation/tasks/update";
-import { CreateTaskInput } from "@/app/_validation/tasks/create";
 import {
   processArrayCreate,
-  processArrayDelete,
+  processArrayRemove,
   processArrayUpdate,
   processObjectUpdate,
 } from "@/lib/cud";
-import { DeleteTaskInput } from "@/app/_validation/tasks/delete";
 
 type Props = {
   defaultData?: CudTodoInput;
@@ -37,49 +30,32 @@ export default function Form({ defaultData }: Props) {
   const debugPayload = {
     update: {
       todo: processObjectUpdate(watch("todo")),
-      tasks: processArrayUpdate(watch("tasks")) as UpdateTaskInput[],
+      tasks: processArrayUpdate(watch("tasks")),
     },
-    delete: {
-      tasks: processArrayDelete(watch("tasks")) as DeleteTaskInput[],
+    remove: {
+      tasks: processArrayRemove(watch("tasks")),
     },
     create: {
-      tasks: processArrayCreate(watch("tasks")) as CreateTaskInput[],
+      tasks: processArrayCreate(watch("tasks")),
     },
   };
 
   const onSubmit = handleSubmit(({ todo, tasks }) => {
-    startTransition(() => {
-      try {
-        const payload = {
-          update: {
-            todo: processObjectUpdate(todo),
-            tasks: processArrayUpdate(tasks) as UpdateTaskInput[],
-          },
-          delete: {
-            tasks: processArrayDelete(tasks) as DeleteTaskInput[],
-          },
-          create: {
-            tasks: processArrayCreate(tasks) as CreateTaskInput[],
-          },
-        };
+    const payload = {
+      update: {
+        todo: processObjectUpdate(todo),
+        tasks: processArrayUpdate(tasks),
+      },
+      remove: {
+        tasks: processArrayRemove(tasks),
+      },
+      create: {
+        tasks: processArrayCreate(tasks),
+      },
+    };
 
-        for (const id of payload.delete.tasks) {
-          deleteTask(id);
-        }
-        for (const step of payload.create.tasks) {
-          createTask({
-            ...step,
-          });
-        }
-        for (const step of payload.update.tasks) {
-          updateTask(step);
-        }
-      } catch (err) {
-        if (err instanceof Error) {
-          console.error(err.message);
-        }
-      }
-    });
+    alert("Check the console");
+    console.log(payload);
   });
 
   const _tasks = useFieldArray({ control, name: "tasks", keyName: "_id" });
@@ -87,31 +63,56 @@ export default function Form({ defaultData }: Props) {
   return (
     <main className="max-w-screen-md mx-auto">
       <form onSubmit={onSubmit} className="grid">
-        <label>TODOS</label>
-        <input
-          {...register("todo.name.value", {
-            onChange: ({ target }) => {
-              const { value } = target as HTMLInputElement;
-              setValue(`todo.name.value`, value);
-              if (value !== defaultValues?.todo?.name?.value) {
-                setValue(`todo.name.action`, `UPDATE`);
-                return;
-              }
-              setValue(`todo.name.action`, "");
-            },
-          })}
-        />
+        <div className="mb-4 font-semibold">ToDo</div>
 
+        <div className="mb-4 grid gap-1">
+          <label>Name</label>
+          <input
+            className="ring-1"
+            {...register("todo.name.value", {
+              onChange: ({ target }) => {
+                const { value } = target as HTMLInputElement;
+                setValue(`todo.name.value`, value);
+                if (value !== defaultValues?.todo?.name?.value) {
+                  setValue(`todo.name.action`, `UPDATE`);
+                  return;
+                }
+                setValue(`todo.name.action`, "");
+              },
+            })}
+          />
+        </div>
+
+        <div className="mb-4 grid gap-1">
+          <label>Description</label>
+          <textarea
+            className="ring-1"
+            {...register("todo.description.value", {
+              onChange: ({ target }) => {
+                const { value } = target as HTMLInputElement;
+                setValue(`todo.description.value`, value);
+                if (value !== defaultValues?.todo?.description?.value) {
+                  setValue(`todo.description.action`, `UPDATE`);
+                  return;
+                }
+                setValue(`todo.description.action`, "");
+              },
+            })}
+          ></textarea>
+        </div>
+
+        <div className="mb-4 font-semibold">Tasks</div>
         <div className="mb-4">
           {_tasks.fields.map((field, index) => {
-            if (field.name.action === "DELETE") return null;
+            if (field.name.action === "REMOVE") return null;
 
             return (
               <div key={field._id}>
                 <div className="flex gap-2">
-                  <div>
+                  <div className="grid gap-1">
                     <label htmlFor={`tasks.${index}.name.value`}>Name</label>
                     <input
+                      className="ring-1"
                       {...register(`tasks.${index}.name.value`, {
                         onChange: ({ target }) => {
                           const { value } = target as HTMLInputElement;
@@ -130,7 +131,7 @@ export default function Form({ defaultData }: Props) {
                       })}
                     />
                   </div>
-                  <div>
+                  <div className="grid gap-1">
                     <label htmlFor={`tasks.${index}.completed.value`}>
                       Completed
                     </label>
@@ -169,35 +170,35 @@ export default function Form({ defaultData }: Props) {
                         ...field,
                         name: {
                           ...field.name,
-                          action: "DELETE",
+                          action: "REMOVE",
                         },
                       });
                     }}
                   >
-                    Delete
+                    Remove
                   </button>
                 </div>
               </div>
             );
           })}
-          <div className="flex justify-center">
-            <button
-              type="button"
-              className="mb-8"
-              onClick={() => {
-                _tasks.append({
-                  name: { value: "", action: "CREATE" },
-                  taskId: { value: "", action: "CREATE" },
-                  completed: { value: false, action: "CREATE" },
-                });
-              }}
-            >
-              Añadir tarea
-            </button>
-          </div>
+        </div>
+        <div>
+          <button
+            type="button"
+            className="mb-8 ring-1"
+            onClick={() => {
+              _tasks.append({
+                name: { value: "", action: "CREATE" },
+                taskId: { value: "", action: "CREATE" },
+                completed: { value: false, action: "CREATE" },
+              });
+            }}
+          >
+            Add task
+          </button>
         </div>
 
-        <button>Save changes</button>
+        <button className="mb-8 ring-1">Save changes</button>
       </form>
 
       <pre>{JSON.stringify(debugPayload, null, 2)}</pre>
