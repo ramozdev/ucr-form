@@ -1,20 +1,20 @@
-# CUD Form
+# UCR Form
 
 ## The problem
 
 We want to have complex forms where multipla database tables can be modified. In order to improve the user experience we wanted all of these actions to happen only when the user presses the `Save Changes` button. This means that we need to track the state of the form and detect which items have been created, updated, or deleted.
 
-Instead of sending the current state of the form to the backend, we want to transform the state of the form into a `create`, `delete` and `update` object containing only the items that have been modified.
+Instead of sending the current state of the form to the backend, we want to transform the state of the form into a `create`, `remove` and `update` object containing only the items that have been modified.
 
 There are two main reasons for this:
 
 1. We want to only update columns that have been modified. This is important for performance reasons. If we send the entire state of the form to the backend, we may be updating columns that have not been modified.
 
-2. We want to make the backend as simple as possible. Functions should only perform one action. In this manner we would have `create`, `delete` and `update` functions which can even be shared in different forms containing the same tables. If we send the entire state of the form to the backend, we will have to write code to handle all of the different cases. This approach is more prone to error.
+2. We want to make the backend as simple as possible. Functions should only perform one action. In this manner we would have `create`, `remove` and `update` functions which can even be shared in different forms containing the same tables. If we send the entire state of the form to the backend, we will have to write code to handle all of the different cases. This approach is more prone to error.
 
 ## The solution
 
-The CUD form convention aims to provide a standard way to transform the state of a form into a `create`, `update`, and `delete` object. This object can then be sent to the backend to be processed.
+The UCR form convention aims to provide a standard way to transform the state of a form into a `create`, `update`, and `remove` object. This object can then be sent to the backend to be processed.
 
 ```json
 {
@@ -41,34 +41,36 @@ The CUD form convention aims to provide a standard way to transform the state of
       }
     ]
   },
-  "delete": {
+  "remove": {
     "tableB": [4, 342, 22]
   }
 }
 ```
 
-### CUDObject
+### UCRObject
 
-The CUD Form is comprised of CUD objects, which are assigned to `<input/>` elements.
+The UCR Form is comprised of UCR objects, which are assigned to `<input/>` elements.
 
-The `key` is the name of the column in the database. Each CUD object must have an `action` and `value` key. The `action` key is a string that describes the action to be taken on the item. The `value` key is the value to be inserted into the database.
+The `key` is the name of the column in the database. Each UCR object must have an `action` and `value` key. The `action` key is a string that describes the action to be taken on the item. The `value` key is the value to be inserted into the database.
 
 ```ts
-type CudObject = {
+type UcrObject = {
   [key: string]: {
-    action: "" | "CREATE" | "UPDATE" | "DELETE" | "ID";
+    action: "" | "CREATE" | "UPDATE" | "REMOVE" | "ID";
     value: string | boolean;
   };
 };
 ```
 
+Note: We don't use the word `delete` because it is a reserved word in JavaScript.
+
 ### Actions
 
 - `""`: No action. This value is assigned by default to items fetched from the database.
-- `"CREATE"`: Create a new row in the database. If any item in a `CudObject` has this action, the entire object will be created. You may omit the `"ID"` key if you are creating a new object.
-- `"UPDATE"`: Update a row in the database. If any item in a `CudObject` has this action, the entire object will be updated. There must be a key with the action `"ID"` in order to update an object.
-- `"DELETE"`: Delete a row in the database. If any item in a `CudObject` has this action, the entire object will be deleted. There must be a key with the action `"ID"` in order to delete an object.
-- `"ID"`: The ID for a row. This item is required for `"UPDATE"` and `"DELETE"` actions.
+- `"CREATE"`: Create a new row in the database. If any item in a `UcrObject` has this action, the entire object will be created. You may omit the `"ID"` key if you are creating a new object.
+- `"UPDATE"`: Update a row in the database. If any item in a `UcrObject` has this action, the entire object will be updated. There must be a key with the action `"ID"` in order to update an object.
+- `"REMOVE"`: Delete a row in the database. If any item in a `UcrObject` has this action, the entire object will be deleted. There must be a key with the action `"ID"` in order to delete an object.
+- `"ID"`: The ID for a row. This item is required for `"UPDATE"` and `"REMOVE"` actions.
 
 ### Example
 
@@ -162,7 +164,7 @@ In this example we are updating the todo list name and description, updating the
         "value": "4"
       },
       "name": {
-        "action": "DELETE",
+        "action": "REMOVE",
         "value": "Ham"
       },
       "completed": {
@@ -197,7 +199,7 @@ const payload = {
     todos: processObjectUpdate(todo),
     tasks: processArrayUpdate(tasks),
   },
-  delete: {
+  remove: {
     tasks: processArrayDelete(tasks),
   },
   create: {
@@ -206,7 +208,7 @@ const payload = {
 };
 ```
 
-This object will be parsed by the `cud` functions and return the following object:
+This object will be parsed by the `ucr` functions and return the following object:
 
 ```json
 {
@@ -234,7 +236,7 @@ This object will be parsed by the `cud` functions and return the following objec
       }
     ]
   },
-  "delete": {
+  "remove": {
     "tasks": [4]
   }
 }
