@@ -1,26 +1,49 @@
-export type CudObject = {
-  [key: string]: {
+export type CudObject = Record<
+  string,
+  {
     action: "" | "CREATE" | "UPDATE" | "REMOVE" | "ID";
     value: string | boolean;
-  };
-};
+  }
+>;
+
+export function processObjectCreate(object: CudObject) {
+  const isCreate = Object.values(object).some(
+    ({ action }) => action === "CREATE"
+  );
+
+  if (!isCreate) return [];
+
+  return [
+    Object.entries(object).reduce<Record<string, string | boolean>>(
+      (acc, [key, item]) => {
+        if (item.action === "CREATE") {
+          acc[key] = item.value;
+        }
+        return acc;
+      },
+      {}
+    ),
+  ];
+}
 
 export function processObjectUpdate(object: CudObject) {
   const isUpdate = Object.values(object).some(
     ({ action }) => action === "UPDATE"
   );
 
-  if (!isUpdate) return {};
+  if (!isUpdate) return [];
 
-  return Object.entries(object).reduce<{ [key: string]: string | boolean }>(
-    (acc, [key, item]) => {
-      if (item.action === "UPDATE" || item.action === "ID") {
-        acc[key] = item.value;
-      }
-      return acc;
-    },
-    {}
-  );
+  return [
+    Object.entries(object).reduce<Record<string, string | boolean>>(
+      (acc, [key, item]) => {
+        if (item.action === "UPDATE" || item.action === "ID") {
+          acc[key] = item.value;
+        }
+        return acc;
+      },
+      {}
+    ),
+  ];
 }
 
 export function processArrayUpdate(array: CudObject[]) {
@@ -29,7 +52,7 @@ export function processArrayUpdate(array: CudObject[]) {
       Object.values(object).some(({ action }) => action === "UPDATE")
     )
     .map((object) => {
-      return Object.entries(object).reduce<{ [key: string]: string | boolean }>(
+      return Object.entries(object).reduce<Record<string, string | boolean>>(
         (acc, [key, item]) => {
           if (item.action === "UPDATE" || item.action === "ID") {
             acc[key] = item.value;
@@ -62,7 +85,7 @@ export function processArrayCreate(array: CudObject[]) {
       return Object.values(object).some(({ action }) => action === "CREATE");
     })
     .map((object) =>
-      Object.entries(object).reduce<{ [key: string]: string | boolean }>(
+      Object.entries(object).reduce<Record<string, string | boolean>>(
         (acc, [key, item]) => {
           if (item.action === "CREATE") {
             acc[key] = item.value;

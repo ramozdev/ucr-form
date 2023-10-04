@@ -19,13 +19,15 @@ The CUD form convention aims to provide a standard way to transform the state of
 ```json
 {
   "update": {
-    "tableA": {
-      "id": 123,
-      "columnB": "value2"
-    },
+    "tableA": [
+      {
+        "id": 123,
+        "columnB": "value2"
+      }
+    ],
     "tableB": [
       {
-        "id": "n4Cda",
+        "id": 789,
         "columnB": "abc",
         "columnC": true
       }
@@ -192,7 +194,7 @@ We propose providing a set of functions which can be used to generate a payload 
 // the `todo` and `tasks` objects come from your form
 const payload = {
   update: {
-    todo: processObjectUpdate(todo),
+    todos: processObjectUpdate(todo),
     tasks: processArrayUpdate(tasks),
   },
   delete: {
@@ -209,11 +211,13 @@ This object will be parsed by the `cud` functions and return the following objec
 ```json
 {
   "update": {
-    "todo": {
-      "todoId": "12",
-      "name": "Shopping",
-      "description": "These are the things that I must buy."
-    },
+    "todos": [
+      {
+        "todoId": "12",
+        "name": "Shopping",
+        "description": "These are the things that I must buy."
+      }
+    ],
     "tasks": [
       {
         "taskId": "3",
