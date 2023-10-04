@@ -1,5 +1,5 @@
 import Form from "@/app/form";
-import { CudTodoInput } from "@/app/validation";
+import { UcrTodoInput } from "@/app/validation";
 
 const tasks = [
   {
@@ -14,7 +14,7 @@ const tasks = [
   },
 ];
 
-const defaultData: CudTodoInput = {
+const defaultData: UcrTodoInput = {
   todo: {
     todoId: {
       action: "ID",

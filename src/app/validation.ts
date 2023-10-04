@@ -1,29 +1,29 @@
 import { z } from "zod";
 
-const cudItemSchema = z.object({
+const ucrItemSchema = z.object({
   value: z.string(),
   action: z.enum(["", "CREATE", "UPDATE", "REMOVE", "ID"]),
 });
 
-const cudTodoSchema = z.object({
+const ucrTodoSchema = z.object({
   todo: z.object({
-    todoId: cudItemSchema,
-    name: cudItemSchema,
-    description: cudItemSchema,
+    todoId: ucrItemSchema,
+    name: ucrItemSchema,
+    description: ucrItemSchema,
   }),
   tasks: z
     .object({
-      taskId: cudItemSchema,
-      name: cudItemSchema,
-      completed: cudItemSchema.pick({ action: true }).extend({
+      taskId: ucrItemSchema,
+      name: ucrItemSchema,
+      completed: ucrItemSchema.pick({ action: true }).extend({
         value: z.boolean(),
       }),
     })
     .array(),
 });
 
-export { cudTodoSchema };
+export { ucrTodoSchema };
 
-type CudTodoInput = z.input<typeof cudTodoSchema>;
+type UcrTodoInput = z.input<typeof ucrTodoSchema>;
 
-export type { CudTodoInput };
+export type { UcrTodoInput };

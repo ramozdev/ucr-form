@@ -1,17 +1,12 @@
 "use client";
 
-import { CudTodoInput, cudTodoSchema } from "@/app/validation";
+import { UcrTodoInput, ucrTodoSchema } from "@/app/validation";
 import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  processArrayCreate,
-  processArrayRemove,
-  processArrayUpdate,
-  processObjectUpdate,
-} from "@/lib/cud";
+import { getUCR } from "@/lib/ucr";
 
 type Props = {
-  defaultData?: CudTodoInput;
+  defaultData?: UcrTodoInput;
 };
 
 export default function Form({ defaultData }: Props) {
@@ -22,37 +17,21 @@ export default function Form({ defaultData }: Props) {
     watch,
     setValue,
     formState: { defaultValues },
-  } = useForm<CudTodoInput>({
+  } = useForm<UcrTodoInput>({
     defaultValues: defaultData,
-    resolver: zodResolver(cudTodoSchema, undefined, { raw: true }),
+    resolver: zodResolver(ucrTodoSchema, undefined, { raw: true }),
   });
 
-  const debugPayload = {
-    update: {
-      todo: processObjectUpdate(watch("todo")),
-      tasks: processArrayUpdate(watch("tasks")),
-    },
-    remove: {
-      tasks: processArrayRemove(watch("tasks")),
-    },
-    create: {
-      tasks: processArrayCreate(watch("tasks")),
-    },
-  };
+  const debugPayload = getUCR({
+    todos: [watch("todo")],
+    tasks: watch("tasks"),
+  });
 
   const onSubmit = handleSubmit(({ todo, tasks }) => {
-    const payload = {
-      update: {
-        todo: processObjectUpdate(todo),
-        tasks: processArrayUpdate(tasks),
-      },
-      remove: {
-        tasks: processArrayRemove(tasks),
-      },
-      create: {
-        tasks: processArrayCreate(tasks),
-      },
-    };
+    const payload = getUCR({
+      todos: [todo],
+      tasks,
+    });
 
     alert("Check the console");
     console.log(payload);

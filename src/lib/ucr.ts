@@ -1,4 +1,4 @@
-export type CudObject = Record<
+export type UcrObject = Record<
   string,
   {
     action: "" | "CREATE" | "UPDATE" | "REMOVE" | "ID";
@@ -6,47 +6,34 @@ export type CudObject = Record<
   }
 >;
 
-export function processObjectCreate(object: CudObject) {
-  const isCreate = Object.values(object).some(
-    ({ action }) => action === "CREATE"
-  );
+export function getUCR(ucrObjects: Record<string, UcrObject[]>) {
+  const update = Object.entries(ucrObjects).reduce<
+    Record<string, ReturnType<typeof getUpdatedItems>>
+  >((acc, [key, value]) => {
+    acc[key] = getUpdatedItems(value);
+    return acc;
+  }, {});
+  const create = Object.entries(ucrObjects).reduce<
+    Record<string, ReturnType<typeof getCreatedItems>>
+  >((acc, [key, value]) => {
+    acc[key] = getCreatedItems(value);
+    return acc;
+  }, {});
+  const remove = Object.entries(ucrObjects).reduce<
+    Record<string, ReturnType<typeof getRemovedItems>>
+  >((acc, [key, value]) => {
+    acc[key] = getRemovedItems(value);
+    return acc;
+  }, {});
 
-  if (!isCreate) return [];
-
-  return [
-    Object.entries(object).reduce<Record<string, string | boolean>>(
-      (acc, [key, item]) => {
-        if (item.action === "CREATE") {
-          acc[key] = item.value;
-        }
-        return acc;
-      },
-      {}
-    ),
-  ];
+  return {
+    update,
+    create,
+    remove,
+  };
 }
 
-export function processObjectUpdate(object: CudObject) {
-  const isUpdate = Object.values(object).some(
-    ({ action }) => action === "UPDATE"
-  );
-
-  if (!isUpdate) return [];
-
-  return [
-    Object.entries(object).reduce<Record<string, string | boolean>>(
-      (acc, [key, item]) => {
-        if (item.action === "UPDATE" || item.action === "ID") {
-          acc[key] = item.value;
-        }
-        return acc;
-      },
-      {}
-    ),
-  ];
-}
-
-export function processArrayUpdate(array: CudObject[]) {
+export function getUpdatedItems(array: UcrObject[]) {
   return array
     .filter((object) =>
       Object.values(object).some(({ action }) => action === "UPDATE")
@@ -64,7 +51,7 @@ export function processArrayUpdate(array: CudObject[]) {
     });
 }
 
-export function processArrayRemove(array: CudObject[]) {
+export function getRemovedItems(array: UcrObject[]) {
   return array
     .filter((object) =>
       Object.values(object).some(({ action }) => action === "REMOVE")
@@ -79,7 +66,7 @@ export function processArrayRemove(array: CudObject[]) {
     );
 }
 
-export function processArrayCreate(array: CudObject[]) {
+export function getCreatedItems(array: UcrObject[]) {
   return array
     .filter((object) => {
       return Object.values(object).some(({ action }) => action === "CREATE");

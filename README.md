@@ -34,6 +34,7 @@ The UCR form convention aims to provide a standard way to transform the state of
     ]
   },
   "create": {
+    "tableA": [],
     "tableB": [
       {
         "columnB": "xyz",
@@ -42,6 +43,7 @@ The UCR form convention aims to provide a standard way to transform the state of
     ]
   },
   "remove": {
+    "tableA": [],
     "tableB": [4, 342, 22]
   }
 }
@@ -194,18 +196,10 @@ We propose providing a set of functions which can be used to generate a payload 
 
 ```ts
 // the `todo` and `tasks` objects come from your form
-const payload = {
-  update: {
-    todos: processObjectUpdate(todo),
-    tasks: processArrayUpdate(tasks),
-  },
-  remove: {
-    tasks: processArrayDelete(tasks),
-  },
-  create: {
-    tasks: processArrayCreate(tasks),
-  },
-};
+const payload = getUCR({
+  todos: [todo],
+  tasks,
+});
 ```
 
 This object will be parsed by the `ucr` functions and return the following object:
@@ -229,6 +223,7 @@ This object will be parsed by the `ucr` functions and return the following objec
     ]
   },
   "create": {
+    "todos": [],
     "tasks": [
       {
         "name": "Potatoes",
@@ -237,6 +232,7 @@ This object will be parsed by the `ucr` functions and return the following objec
     ]
   },
   "remove": {
+    "todos": [],
     "tasks": [4]
   }
 }
