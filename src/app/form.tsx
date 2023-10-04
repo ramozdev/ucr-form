@@ -3,7 +3,7 @@
 import { UcrTodoInput, ucrTodoSchema } from "@/app/validation";
 import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { getUCR } from "@/lib/ucr";
+import { getUCR } from "ucr";
 
 type Props = {
   defaultData?: UcrTodoInput;

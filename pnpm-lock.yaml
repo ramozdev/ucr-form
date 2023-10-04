@@ -47,6 +47,9 @@ dependencies:
   typescript:
     specifier: 5.2.2
     version: 5.2.2
+  ucr:
+    specifier: ^0.0.2
+    version: 0.0.2
   zod:
     specifier: ^3.22.2
     version: 3.22.2
@@ -2527,6 +2530,10 @@ packages:
     resolution: {integrity: sha512-mI4WrpHsbCIcwT9cF4FZvr80QUeKvsUsUvKDoR+X/7XHQH98xYD8YHZg7ANtz2GtZt/CBq2QJ0thkGJMHfqc1w==}
     engines: {node: '>=14.17'}
     hasBin: true
+    dev: false
+
+  /ucr@0.0.2:
+    resolution: {integrity: sha512-Xov9A37X+/783cdVXcBQvMvIV4eQd4bOjgg7uXp7rXn30+QlzFxOAXTuCo31X7/7pzUYkyuemvN3sWVRPXEWCw==}
     dev: false
 
   /unbox-primitive@1.0.2:
