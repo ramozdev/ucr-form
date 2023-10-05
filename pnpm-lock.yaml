@@ -48,8 +48,8 @@ dependencies:
     specifier: 5.2.2
     version: 5.2.2
   ucr:
-    specifier: ^0.0.2
-    version: 0.0.2
+    specifier: ^0.0.3
+    version: 0.0.3
   zod:
     specifier: ^3.22.2
     version: 3.22.2
@@ -2532,8 +2532,8 @@ packages:
     hasBin: true
     dev: false
 
-  /ucr@0.0.2:
-    resolution: {integrity: sha512-Xov9A37X+/783cdVXcBQvMvIV4eQd4bOjgg7uXp7rXn30+QlzFxOAXTuCo31X7/7pzUYkyuemvN3sWVRPXEWCw==}
+  /ucr@0.0.3:
+    resolution: {integrity: sha512-H1TyA+JkgKY6v/mnFS41jkbDj8xEUMAl+8Xoin3aU/j+jAcJjKdG3iGnABdJAb9ori4YUqmQvNO0Vu/CuQCZrQ==}
     dev: false
 
   /unbox-primitive@1.0.2:

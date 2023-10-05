@@ -40,8 +40,8 @@ export default function Form({ defaultData }: Props) {
   const _tasks = useFieldArray({ control, name: "tasks", keyName: "_id" });
 
   return (
-    <main className="max-w-screen-md mx-auto">
-      <form onSubmit={onSubmit} className="grid">
+    <main className="mx-auto max-w-screen-md">
+      <form onSubmit={(e) => void onSubmit(e)} className="grid">
         <div className="mb-4 font-semibold">ToDo</div>
 
         <div className="mb-4 grid gap-1">
@@ -52,11 +52,11 @@ export default function Form({ defaultData }: Props) {
               onChange: ({ target }) => {
                 const { value } = target as HTMLInputElement;
                 setValue(`todo.name.value`, value);
-                if (value !== defaultValues?.todo?.name?.value) {
-                  setValue(`todo.name.action`, `UPDATE`);
+                if (value === defaultValues?.todo?.name?.value) {
+                  setValue(`todo.name.action`, "");
                   return;
                 }
-                setValue(`todo.name.action`, "");
+                setValue(`todo.name.action`, `UPDATE`);
               },
             })}
           />
@@ -70,11 +70,11 @@ export default function Form({ defaultData }: Props) {
               onChange: ({ target }) => {
                 const { value } = target as HTMLInputElement;
                 setValue(`todo.description.value`, value);
-                if (value !== defaultValues?.todo?.description?.value) {
-                  setValue(`todo.description.action`, `UPDATE`);
+                if (value === defaultValues?.todo?.description?.value) {
+                  setValue(`todo.description.action`, "");
                   return;
                 }
-                setValue(`todo.description.action`, "");
+                setValue(`todo.description.action`, `UPDATE`);
               },
             })}
           ></textarea>
@@ -90,13 +90,18 @@ export default function Form({ defaultData }: Props) {
                 <div className="flex gap-2">
                   <div className="grid gap-1">
                     <label htmlFor={`tasks.${index}.name.value`}>Name</label>
-                    <input
-                      className="ring-1"
-                      {...register(`tasks.${index}.name.value`, {
-                        onChange: ({ target }) => {
-                          const { value } = target as HTMLInputElement;
-                          setValue(`tasks.${index}.name.value`, value);
-                          if (field.taskId.action !== "CREATE") {
+                    {field.taskId.action === "CREATE" ? (
+                      <input
+                        className="ring-1"
+                        {...register(`tasks.${index}.name.value`)}
+                      />
+                    ) : (
+                      <input
+                        className="ring-1"
+                        {...register(`tasks.${index}.name.value`, {
+                          onChange: ({ target }) => {
+                            const { value } = target as HTMLInputElement;
+                            setValue(`tasks.${index}.name.value`, value);
                             if (
                               value ===
                               defaultValues?.tasks?.[index]?.name?.value
@@ -105,22 +110,27 @@ export default function Form({ defaultData }: Props) {
                               return;
                             }
                             setValue(`tasks.${index}.name.action`, `UPDATE`);
-                          }
-                        },
-                      })}
-                    />
+                          },
+                        })}
+                      />
+                    )}
                   </div>
                   <div className="grid gap-1">
                     <label htmlFor={`tasks.${index}.completed.value`}>
                       Completed
                     </label>
-                    <input
-                      type="checkbox"
-                      {...register(`tasks.${index}.completed.value`, {
-                        onChange: ({ target }) => {
-                          const { checked } = target as HTMLInputElement;
-                          setValue(`tasks.${index}.completed.value`, checked);
-                          if (field.taskId.action !== "CREATE") {
+                    {field.taskId.action === "CREATE" ? (
+                      <input
+                        type="checkbox"
+                        {...register(`tasks.${index}.completed.value`)}
+                      />
+                    ) : (
+                      <input
+                        type="checkbox"
+                        {...register(`tasks.${index}.completed.value`, {
+                          onChange: ({ target }) => {
+                            const { checked } = target as HTMLInputElement;
+                            setValue(`tasks.${index}.completed.value`, checked);
                             if (
                               checked ===
                               defaultValues?.tasks?.[index]?.completed?.value
@@ -132,10 +142,10 @@ export default function Form({ defaultData }: Props) {
                               `tasks.${index}.completed.action`,
                               `UPDATE`
                             );
-                          }
-                        },
-                      })}
-                    />
+                          },
+                        })}
+                      />
+                    )}
                   </div>
                   <button
                     type="button"
@@ -154,7 +164,7 @@ export default function Form({ defaultData }: Props) {
                       });
                     }}
                   >
-                    Remove
+                    Delete
                   </button>
                 </div>
               </div>
@@ -177,11 +187,23 @@ export default function Form({ defaultData }: Props) {
           </button>
         </div>
 
-        <button className="mb-8 ring-1">Save changes</button>
+        <button className="ring-1">Save changes</button>
       </form>
 
-      <pre>{JSON.stringify(debugPayload, null, 2)}</pre>
-      <pre>{JSON.stringify(watch(), null, 2)}</pre>
+      <div className="flex gap-2">
+        <div>
+          <div>
+            <pre>getUCR()</pre>
+          </div>
+          <pre>{JSON.stringify(debugPayload, null, 2)}</pre>
+        </div>
+        <div>
+          <div>
+            <pre>watch()</pre>
+          </div>
+          <pre>{JSON.stringify(watch(), null, 2)}</pre>
+        </div>
+      </div>
     </main>
   );
 }
