@@ -3,7 +3,8 @@
 import { UcrTodoInput, ucrTodoSchema } from "@/app/validation";
 import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { getUCR } from "ucr";
+import { getUCR } from "../ucr";
+import Notes from "@/app/nested";
 
 type Props = {
   defaultData?: UcrTodoInput;
@@ -22,15 +23,32 @@ export default function Form({ defaultData }: Props) {
     resolver: zodResolver(ucrTodoSchema, undefined, { raw: true }),
   });
 
+  const test = {
+    tasks: watch("tasks"),
+  };
+
   const debugPayload = getUCR({
     todos: [watch("todo")],
-    tasks: watch("tasks"),
+    // tasks: watch("tasks"),
+    tasks: [
+      {
+        notes: [
+          {
+            tasks: [
+              {
+                notes: [{}],
+              },
+            ],
+          },
+        ],
+      },
+    ],
   });
 
   const onSubmit = handleSubmit(({ todo, tasks }) => {
     const payload = getUCR({
       todos: [todo],
-      tasks,
+      // tasks,
     });
 
     alert("Check the console");
@@ -87,6 +105,12 @@ export default function Form({ defaultData }: Props) {
 
             return (
               <div key={field._id}>
+                <Notes
+                  control={control}
+                  parentIndex={index}
+                  setValue={setValue}
+                  register={register}
+                />
                 <div className="flex gap-2">
                   <div className="grid gap-1">
                     <label htmlFor={`tasks.${index}.name.value`}>Name</label>
@@ -180,6 +204,7 @@ export default function Form({ defaultData }: Props) {
                 name: { value: "", action: "CREATE" },
                 taskId: { value: "", action: "CREATE" },
                 completed: { value: false, action: "CREATE" },
+                notes: [],
               });
             }}
           >

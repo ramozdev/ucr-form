@@ -19,6 +19,15 @@ const ucrTodoSchema = z.object({
         value: z.boolean(),
       }),
     })
+    .extend({
+      notes: z
+        .object({
+          noteId: ucrItemSchema,
+          taskId: ucrItemSchema,
+          text: ucrItemSchema,
+        })
+        .array(),
+    })
     .array(),
 });
 

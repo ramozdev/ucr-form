@@ -14,6 +14,17 @@ const tasks = [
   },
 ];
 
+const notes = [
+  {
+    noteId: "3",
+    text: "Lorem ipsum",
+  },
+  {
+    noteId: "4",
+    text: "Dolor sit amet",
+  },
+];
+
 const defaultData: UcrTodoInput = {
   todo: {
     todoId: {
@@ -43,6 +54,20 @@ const defaultData: UcrTodoInput = {
       action: "",
       value: false,
     },
+    notes: notes.map(({ noteId, text }) => ({
+      noteId: {
+        action: "ID",
+        value: noteId,
+      },
+      taskId: {
+        action: "",
+        value: task.taskId,
+      },
+      text: {
+        action: "",
+        value: text,
+      },
+    })),
   })),
 };
 
