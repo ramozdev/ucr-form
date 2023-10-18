@@ -11,12 +11,14 @@ export default function Notes({
   control,
   setValue,
   register,
+  parentId,
   defaultValues,
 }: {
   parentIndex: number;
   control: Control<UcrTodoInput>;
   register: UseFormRegister<UcrTodoInput>;
   setValue: UseFormSetValue<UcrTodoInput>;
+  parentId: string;
   defaultValues?: UcrTodoInput;
 }) {
   const _notes = useFieldArray({
@@ -26,7 +28,7 @@ export default function Notes({
   });
 
   return (
-    <div className="mb-4">
+    <div className="mb-4 border m-4">
       {_notes.fields.map((field, index) => {
         if (field.text.action === "REMOVE") return null;
 
@@ -100,6 +102,21 @@ export default function Notes({
           </div>
         );
       })}
+      <div>
+        <button
+          type="button"
+          className="mb-8 ring-1"
+          onClick={() => {
+            _notes.append({
+              noteId: { action: "CREATE", value: "" },
+              taskId: { action: "CREATE", value: parentId },
+              text: { action: "CREATE", value: "" },
+            });
+          }}
+        >
+          Add task
+        </button>
+      </div>
     </div>
   );
 }

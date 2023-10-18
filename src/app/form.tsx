@@ -3,7 +3,7 @@
 import { UcrTodoInput, ucrTodoSchema } from "@/app/validation";
 import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { getUCR } from "../ucr";
+import { getCreatedItems, getRemovedItems, getUpdatedItems } from "ucr";
 import Notes from "@/app/nested";
 
 type Props = {
@@ -23,33 +23,86 @@ export default function Form({ defaultData }: Props) {
     resolver: zodResolver(ucrTodoSchema, undefined, { raw: true }),
   });
 
-  const test = {
-    tasks: watch("tasks"),
+  const debugPayload = {
+    update: {
+      todos: getUpdatedItems([watch("todo")]),
+      tasks: watch("tasks")
+        .map(({ notes, ...task }) => {
+          const parsedNotes = getUpdatedItems(notes);
+          if (parsedNotes.length === 0)
+            return { ...getUpdatedItems([task])[0] };
+
+          return {
+            ...getUpdatedItems([task])[0],
+            notes: parsedNotes,
+          };
+        })
+        .filter((task) => Object.keys(task).length > 0),
+    },
+    create: {
+      todos: getCreatedItems([watch("todo")]),
+      tasks: watch("tasks")
+        .map(({ notes, ...task }) => {
+          const parsedNotes = getCreatedItems(notes);
+          if (parsedNotes.length === 0)
+            return { ...getCreatedItems([task])[0] };
+
+          return {
+            ...getCreatedItems([task])[0],
+            notes: parsedNotes,
+          };
+        })
+        .filter((task) => Object.keys(task).length > 0),
+    },
+    remove: {
+      todos: getRemovedItems([watch("todo")]),
+      tasks: watch("tasks").flatMap(({ notes, ...task }) =>
+        getRemovedItems([task])
+      ),
+      notes: watch("tasks").flatMap(({ notes }) => getRemovedItems(notes)),
+    },
   };
 
-  const debugPayload = getUCR({
-    todos: [watch("todo")],
-    // tasks: watch("tasks"),
-    tasks: [
-      {
-        notes: [
-          {
-            tasks: [
-              {
-                notes: [{}],
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  });
-
   const onSubmit = handleSubmit(({ todo, tasks }) => {
-    const payload = getUCR({
-      todos: [todo],
-      // tasks,
-    });
+    const payload = {
+      update: {
+        todos: getUpdatedItems([watch("todo")]),
+        tasks: watch("tasks")
+          .map(({ notes, ...task }) => {
+            const parsedNotes = getUpdatedItems(notes);
+            if (parsedNotes.length === 0)
+              return { ...getUpdatedItems([task])[0] };
+
+            return {
+              ...getUpdatedItems([task])[0],
+              notes: parsedNotes,
+            };
+          })
+          .filter((task) => Object.keys(task).length > 0),
+      },
+      create: {
+        todos: getCreatedItems([watch("todo")]),
+        tasks: watch("tasks")
+          .map(({ notes, ...task }) => {
+            const parsedNotes = getCreatedItems(notes);
+            if (parsedNotes.length === 0)
+              return { ...getCreatedItems([task])[0] };
+
+            return {
+              ...getCreatedItems([task])[0],
+              notes: parsedNotes,
+            };
+          })
+          .filter((task) => Object.keys(task).length > 0),
+      },
+      remove: {
+        todos: getRemovedItems([watch("todo")]),
+        tasks: watch("tasks").flatMap(({ notes, ...task }) =>
+          getRemovedItems([task])
+        ),
+        notes: watch("tasks").flatMap(({ notes }) => getRemovedItems(notes)),
+      },
+    };
 
     alert("Check the console");
     console.log(payload);
@@ -104,13 +157,7 @@ export default function Form({ defaultData }: Props) {
             if (field.name.action === "REMOVE") return null;
 
             return (
-              <div key={field._id}>
-                <Notes
-                  control={control}
-                  parentIndex={index}
-                  setValue={setValue}
-                  register={register}
-                />
+              <div key={field._id} className="border mb-4">
                 <div className="flex gap-2">
                   <div className="grid gap-1">
                     <label htmlFor={`tasks.${index}.name.value`}>Name</label>
@@ -191,6 +238,13 @@ export default function Form({ defaultData }: Props) {
                     Delete
                   </button>
                 </div>
+                <Notes
+                  parentId={field.taskId.value}
+                  control={control}
+                  parentIndex={index}
+                  setValue={setValue}
+                  register={register}
+                />
               </div>
             );
           })}
