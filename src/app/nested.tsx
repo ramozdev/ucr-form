@@ -1,4 +1,8 @@
 import { UcrTodoInput } from "@/app/validation";
+import Button from "@/ui/html/button";
+import Card from "@/ui/html/card";
+import Input from "@/ui/html/input";
+import Label from "@/ui/html/label";
 import {
   Control,
   UseFormRegister,
@@ -28,7 +32,7 @@ export default function Notes({
   });
 
   return (
-    <div className="mb-4 border m-4">
+    <Card>
       {_notes.fields.map((field, index) => {
         if (field.text.action === "REMOVE") return null;
 
@@ -36,21 +40,19 @@ export default function Notes({
           <div key={field._id}>
             <div className="flex gap-2">
               <div className="grid gap-1">
-                <label
+                <Label
                   htmlFor={`tasks.${parentIndex}.notes.${index}.text.value`}
                 >
                   Note
-                </label>
+                </Label>
                 {field.noteId.action === "CREATE" ? (
-                  <input
-                    className="ring-1"
+                  <Input
                     {...register(
                       `tasks.${parentIndex}.notes.${index}.text.value`
                     )}
                   />
                 ) : (
-                  <input
-                    className="ring-1"
+                  <Input
                     {...register(
                       `tasks.${parentIndex}.notes.${index}.text.value`,
                       {
@@ -79,7 +81,7 @@ export default function Notes({
                   />
                 )}
               </div>
-              <button
+              <Button.Subtle
                 type="button"
                 className="mt-auto"
                 onClick={() => {
@@ -97,15 +99,15 @@ export default function Notes({
                 }}
               >
                 Delete
-              </button>
+              </Button.Subtle>
             </div>
           </div>
         );
       })}
       <div>
-        <button
+        <Button.Subtle
           type="button"
-          className="mb-8 ring-1"
+          className="mb-8"
           onClick={() => {
             _notes.append({
               noteId: { action: "CREATE", value: "" },
@@ -115,8 +117,8 @@ export default function Notes({
           }}
         >
           Add task
-        </button>
+        </Button.Subtle>
       </div>
-    </div>
+    </Card>
   );
 }
